@@ -162,6 +162,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Guitar.cpp" />
+    <ClCompile Include="Kinect.cpp" />
+    <ClCompile Include="Kinecter.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -275,6 +278,11 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="Example\YomogiFont.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Guitar.h" />
+    <ClInclude Include="Kinect.h" />
+    <ClInclude Include="Kinecter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

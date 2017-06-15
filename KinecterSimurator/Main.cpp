@@ -1,14 +1,10 @@
-﻿
-# include <Siv3D.hpp>
+﻿//siv3dシリアル通信サンプルプログラム
+#include <Siv3D.hpp>
+#include "Kinecter.h"
 
 void Main()
 {
-	const Font font(30);
-
-	while (System::Update())
-	{
-		font(L"ようこそ、Siv3D の世界へ！").draw();
-
-		Circle(Mouse::Pos(), 50).draw({ 255, 0, 0, 127 });
-	}
+	Kinecter* k = new Kinecter();
+	k->Run();
+	delete(k);
 }

@@ -57,9 +57,7 @@ private:
 	const int rowMax = 5;
 
 	const int baudrate = 115200;
-
 	const int comPort = 3;
-
 	const int midiCh = 0;
 
 	

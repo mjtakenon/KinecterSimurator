@@ -14,16 +14,16 @@ Kinect::~Kinect()
 {
 
 }
-
-inline double Kinect::getHandDiff()
+/*
+double Kinect::getHandDiff()
 {
 	return handDiff;
 }
 
-inline vector<double> Kinect::getHandAngle()
+vector<double> Kinect::getHandAngle()
 {
 	return handAngle;
-}
+}*/
 
 void Kinect::Update()
 {

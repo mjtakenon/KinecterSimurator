@@ -13,9 +13,8 @@ public:
 	void Update();
 	void Draw(vector<int> soundTime, vector<double> fletAngle);
 
-	inline double	getHandDiff();
-	inline vector<double> getHandAngle();
-
+	double getHandDiff() { return handDiff; };
+	vector<double> getHandAngle() { return handAngle; };
 
 private:
 	array<Optional<KinectV1Body>, 2>	bodies;
@@ -24,7 +23,6 @@ private:
 	vector<Vec3>		currentBodyPos;
 
 	vector<double>	handAngle;
-
 
 	Vec2		depthDrawPos;
 	const int	logSize = 10;

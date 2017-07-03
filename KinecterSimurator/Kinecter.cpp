@@ -267,16 +267,19 @@ void Kinecter::playSound()
 	double currentHandAngle;
 	double prevHandAngle;
 
+	vector<double> ha = m_Kinect->getHandAngle();
 	
 	if (Abs(m_Kinect->getHandDiff()) > 0.35)
 	{
 		return;
 	}
 
-	if (m_Kinect->getHandAngle().size() >= 2)
+	if (ha.size() >= 2)
 	{
-		currentHandAngle = m_Kinect->getHandAngle()[m_Kinect->getHandAngle().size() - 1];
-		prevHandAngle = m_Kinect->getHandAngle()[m_Kinect->getHandAngle().size() - 2];
+		//currentHandAngle = m_Kinect->getHandAngle().at(m_Kinect->getHandAngle().size() - 1);
+		//prevHandAngle = m_Kinect->getHandAngle().at(m_Kinect->getHandAngle().size() - 2);
+		currentHandAngle = ha[9];
+		currentHandAngle = ha[8];
 	}
 	else
 	{

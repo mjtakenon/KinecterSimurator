@@ -82,7 +82,7 @@ Kinecter::Kinecter()
 	client.connect(serverAddress, port);
 
 
-	m_Kinect = new Kinect(fletMax);
+	m_KinectManager = new KinectManager(fletMax);
 
 	
 	if (!serial.setup(comPort, baudrate))
@@ -90,14 +90,14 @@ Kinecter::Kinecter()
 		MessageBox::Show(L"シリアルデバイスにアクセスできません.");
 	}
 
-	if (!KinectV1::IsAvailable())
+	if (!KinectV2::IsAvailable())
 	{
-		MessageBox::Show(L"KinectV1にアクセスできません.");
+		MessageBox::Show(L"KinectV2にアクセスできません.");
 	}
 
-	if (!KinectV1::Start(KinectV1DataType::Depth_640x480 + KinectV1DataType::BodyIndex + KinectV1DataType::Body))
+	if (!KinectV2::Start(KinectV2DataType::Default))
 	{
-		MessageBox::Show(L"KinectV1を起動できませんでした.");
+		MessageBox::Show(L"KinectV2を起動できませんでした.");
 	}
 	/*
 	if (!client.isConnected())
@@ -132,7 +132,7 @@ void Kinecter::Run()
 void Kinecter::Update()
 {
 	buttonState = getButtonState(buttonState);
-	m_Kinect->Update();
+	m_KinectManager->Update();
 
 	drawGuitar();
 }
@@ -141,7 +141,7 @@ void Kinecter::Draw()
 {
 	ClearPrint();
 	
-	m_Kinect->Draw(soundTime, fletAngle);
+	m_KinectManager->Draw(soundTime, fletAngle);
 
 	playSound();
 	
@@ -267,65 +267,79 @@ void Kinecter::playSound()
 	double currentHandAngle;
 	double prevHandAngle;
 
-	vector<double> ha = m_Kinect->getHandAngle();
-	
-	if (Abs(m_Kinect->getHandDiff()) > 0.35)
-	{
-		return;
-	}
-
-	if (ha.size() >= 2)
-	{
-		//currentHandAngle = m_Kinect->getHandAngle().at(m_Kinect->getHandAngle().size() - 1);
-		//prevHandAngle = m_Kinect->getHandAngle().at(m_Kinect->getHandAngle().size() - 2);
-		currentHandAngle = ha[9];
-		currentHandAngle = ha[8];
-	}
-	else
-	{
-		currentHandAngle = 0;
-		prevHandAngle = 0;
-	}
-
-
-	for (int i = 0; i < fletMax; i++)
-	{
-		if (inputKeyAssign[i].clicked 
-			|| (currentHandAngle > fletAngle[i] && prevHandAngle < fletAngle[i] && prevHandAngle > 0 && currentHandAngle > 0)
-			|| (currentHandAngle < fletAngle[i] && prevHandAngle > fletAngle[i] && prevHandAngle > 0 && currentHandAngle > 0))
+	vector<vector<double>> handAngles = m_KinectManager->getHandAngle();
+	//とりあえず0人目の
+	for (int body = 0; body < 6; body++)
 		{
-			Midi::SendMessage(MidiMessage::NoteOff(midiCh, playingPitch[i]));
 
-			bool anyPushed = false;
-			for (int j = rowMax-1; j >= 0; j--)
+		vector<double> ha = handAngles[body];
+	
+		if (Abs(m_KinectManager->getHandDiff()[body]) > 0.35)
+		{
+			return;
+		}
+
+		if (ha.size() >= 2)
+		{
+			//currentHandAngle = m_KinectManager->getHandAngle().at(m_KinectManager->getHandAngle().size() - 1);
+			//prevHandAngle = m_KinectManager->getHandAngle().at(m_KinectManager->getHandAngle().size() - 2);
+			currentHandAngle = ha[ha.size()-1];
+
+			prevHandAngle = ha[ha.size() - 2];
+		}
+		else
+		{
+			currentHandAngle = 0;
+			prevHandAngle = 0;
+		}
+
+		Println(ha);
+
+		for (int i = 0; i < fletMax; i++)
+		{
+			if (inputKeyAssign[i].clicked 
+				|| (currentHandAngle > fletAngle[i] && prevHandAngle < fletAngle[i] && prevHandAngle > 0 && currentHandAngle > 0)
+				|| (currentHandAngle < fletAngle[i] && prevHandAngle > fletAngle[i] && prevHandAngle > 0 && currentHandAngle > 0))
 			{
-				if (buttonState[j][i] == true && anyPushed == false)
+				Midi::SendMessage(MidiMessage::NoteOff(midiCh, playingPitch[i]));
+
+				bool anyPushed = false;
+				for (int j = rowMax-1; j >= 0; j--)
 				{
-					playingPitch[i] = basePitch[i]+j+1;
-					anyPushed = true;
+					if (buttonState[j][i] == true && anyPushed == false)
+					{
+						playingPitch[i] = basePitch[i]+j+1;
+						anyPushed = true;
+					}
+					else if (j == 0 && anyPushed == false)
+					{
+						playingPitch[i] = basePitch[i];
+					}
 				}
-				else if (j == 0 && anyPushed == false)
-				{
-					playingPitch[i] = basePitch[i];
-				}
+
+				Midi::SendMessage(MidiMessage::NoteOn(midiCh, pitchTable[playingPitch[i]]));
+				soundTime[i] = 1;
+			}
+		}
+
+		for (int i = 0; i < fletMax; i++)
+		{
+			if (soundTime[i] > 0)
+			{
+				soundTime[i]++;
 			}
 
-			Midi::SendMessage(MidiMessage::NoteOn(midiCh, pitchTable[playingPitch[i]]));
-			soundTime[i] = 1;
+			if (soundTime[i] >= 128)
+			{
+				Midi::SendMessage(MidiMessage::NoteOff(midiCh, playingPitch[i]));
+				soundTime[i] = 0;
+			}
 		}
 	}
+}
 
-	for (int i = 0; i < fletMax; i++)
-	{
-		if (soundTime[i] > 0)
-		{
-			soundTime[i]++;
-		}
 
-		if (soundTime[i] >= 128)
-		{
-			Midi::SendMessage(MidiMessage::NoteOff(midiCh, playingPitch[i]));
-			soundTime[i] = 0;
-		}
-	}
+pair<vector<int>,vector<int>> Kinecter::getButtonState()
+{
+	return make_pair(this->soundTime, this->playingPitch);
 }

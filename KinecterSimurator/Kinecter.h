@@ -2,7 +2,7 @@
 
 #include <Siv3D.hpp>
 
-#include "Kinect.h"
+#include "KinectManager.h"
 #include "Guitar.h"
 
 using namespace std;
@@ -16,10 +16,13 @@ public:
 
 	void Run();
 
-private:
-
 	void Update();
 	void Draw();
+
+	pair<vector<int>,vector<int>> getButtonState();
+
+
+private:
 
 	String getSerialMessage();
 	String getWiFiMessage();
@@ -32,7 +35,7 @@ private:
 private:
 
 	Guitar* m_Guitar;
-	Kinect* m_Kinect;
+	KinectManager* m_KinectManager;
 
 	vector<int> soundTime;
 	vector<int> playingPitch;

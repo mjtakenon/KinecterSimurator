@@ -84,10 +84,10 @@
     <ClCompile Include="Guitar.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Kinect.cpp">
+    <ClCompile Include="Kinecter.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Kinecter.cpp">
+    <ClCompile Include="KinectManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -407,10 +407,10 @@
     <ClInclude Include="Guitar.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Kinect.h">
+    <ClInclude Include="Kinecter.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Kinecter.h">
+    <ClInclude Include="KinectManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
